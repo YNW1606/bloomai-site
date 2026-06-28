@@ -1,0 +1,61 @@
+{
+  "allowCustomDataForDataTypeAny": true,
+  "functions": [
+    {
+      "id": "ACCOUNT",
+      "name": "ACCOUNT",
+      "description": "Returns the BloomAI account summary as a spilled array (broker, account, server, balance, equity, live).",
+      "parameters": [
+        {
+          "name": "apiKey",
+          "description": "Optional API key. If omitted, uses the key saved in the task pane.",
+          "type": "string",
+          "optional": true
+        }
+      ],
+      "result": { "dimensionality": "matrix" }
+    },
+    {
+      "id": "FLOATINGPNL",
+      "name": "FLOATINGPNL",
+      "description": "Returns the current total floating (unrealized) P&L from BloomAI.",
+      "parameters": [
+        {
+          "name": "apiKey",
+          "description": "Optional API key. If omitted, uses the key saved in the task pane.",
+          "type": "string",
+          "optional": true
+        }
+      ],
+      "result": { "dimensionality": "scalar" }
+    },
+    {
+      "id": "POSITIONS",
+      "name": "POSITIONS",
+      "description": "Returns open positions as a spilled array (symbol, direction, lots, entry, sl, tp, pnl, open_time).",
+      "parameters": [
+        {
+          "name": "apiKey",
+          "description": "Optional API key. If omitted, uses the key saved in the task pane.",
+          "type": "string",
+          "optional": true
+        }
+      ],
+      "result": { "dimensionality": "matrix" }
+    },
+    {
+      "id": "WINRATE",
+      "name": "WINRATE",
+      "description": "Returns the 30-day win rate percentage from BloomAI.",
+      "parameters": [
+        {
+          "name": "apiKey",
+          "description": "Optional API key. If omitted, uses the key saved in the task pane.",
+          "type": "string",
+          "optional": true
+        }
+      ],
+      "result": { "dimensionality": "scalar" }
+    }
+  ]
+}

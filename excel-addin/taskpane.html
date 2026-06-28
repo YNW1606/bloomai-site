@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BloomAI for Excel</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --panel-2: #1c2530;
+      --border: #2a3340;
+      --text: #e6edf3;
+      --muted: #8b98a5;
+      --accent: #3b82f6;
+      --accent-2: #2563eb;
+      --green: #16c784;
+      --red: #ea3943;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      font-size: 13px;
+    }
+    .wrap { padding: 14px; }
+    .brand {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 14px;
+    }
+    .brand .dot {
+      width: 22px; height: 22px; border-radius: 6px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    }
+    .brand h1 { font-size: 16px; margin: 0; font-weight: 600; letter-spacing: .3px; }
+    .brand small { color: var(--muted); display: block; font-size: 11px; font-weight: 400; }
+
+    label { display: block; color: var(--muted); margin: 10px 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+    input[type="text"], input[type="password"] {
+      width: 100%; padding: 8px 10px;
+      background: var(--panel); color: var(--text);
+      border: 1px solid var(--border); border-radius: 6px;
+      font-size: 13px; outline: none;
+    }
+    input:focus { border-color: var(--accent); }
+
+    .row { display: flex; gap: 8px; align-items: center; }
+    .row input { flex: 1; }
+
+    .card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px; margin-bottom: 12px;
+    }
+    .card h2 { font-size: 12px; margin: 0 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+
+    button {
+      width: 100%; padding: 9px 12px; margin-top: 8px;
+      background: var(--accent-2); color: #fff;
+      border: none; border-radius: 6px; cursor: pointer;
+      font-size: 13px; font-weight: 600;
+      transition: background .15s ease;
+    }
+    button:hover { background: var(--accent); }
+    button:disabled { opacity: .5; cursor: not-allowed; }
+    button.ghost { background: var(--panel-2); color: var(--text); border: 1px solid var(--border); }
+    button.ghost:hover { background: #243040; }
+
+    .hint { color: var(--muted); font-size: 11px; margin-top: 6px; line-height: 1.5; }
+    .toggle { display: flex; align-items: center; gap: 6px; margin-top: 6px; color: var(--muted); font-size: 11px; }
+
+    #status {
+      margin-top: 10px; padding: 9px 11px; border-radius: 6px;
+      font-size: 12px; display: none; line-height: 1.4;
+      word-break: break-word;
+    }
+    #status.ok  { display: block; background: rgba(22,199,132,.12); border: 1px solid rgba(22,199,132,.4); color: var(--green); }
+    #status.err { display: block; background: rgba(234,57,67,.12);  border: 1px solid rgba(234,57,67,.4);  color: var(--red); }
+    #status.info{ display: block; background: var(--panel-2); border: 1px solid var(--border); color: var(--muted); }
+
+    a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <div class="dot"></div>
+      <div>
+        <h1>BloomAI</h1>
+        <small>Live trading data &rarr; Excel</small>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Connection</h2>
+      <label for="baseUrl">Base URL</label>
+      <input type="text" id="baseUrl" placeholder="https://bloomai-backend-production.up.railway.app" />
+
+      <label for="apiKey">API Key (X-API-Key)</label>
+      <div class="row">
+        <input type="password" id="apiKey" placeholder="paste your BloomAI API key" />
+      </div>
+      <label class="toggle"><input type="checkbox" id="showKey" /> Show key</label>
+      <button class="ghost" id="saveBtn">Save settings</button>
+      <div class="hint">Create a key in BloomAI Admin &rarr; Platform &rarr; API Keys. Stored locally in this browser only.</div>
+    </div>
+
+    <div class="card">
+      <h2>Insert into worksheet</h2>
+      <div class="hint">Data is written starting at the currently selected cell on the active sheet.</div>
+      <button id="btnAccount">Insert Account</button>
+      <button id="btnPositions">Insert Positions</button>
+      <button id="btnPerformance">Insert Performance</button>
+    </div>
+
+    <div id="status"></div>
+
+    <div class="hint" style="margin-top:14px;">
+      Tip: custom functions like <code>=BLOOMAI.ACCOUNT()</code> and <code>=BLOOMAI.WINRATE()</code>
+      are also available once the add-in is loaded. See the README.
+    </div>
+  </div>
+
+  <script src="taskpane.js"></script>
+</body>
+</html>
