@@ -35,8 +35,9 @@ header.site .nav a:hover{color:var(--gold)}
 .hero .tag{color:var(--gold);font-size:14px;letter-spacing:2px;text-transform:uppercase;margin:0}
 .hero p{color:var(--muted);max-width:540px;margin:14px auto 0}
 .wrap{max-width:960px;margin:0 auto;padding:8px 24px 90px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:26px}
-@media(max-width:720px){.grid{grid-template-columns:1fr}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:20px;margin-top:26px}
+@media(max-width:620px){.grid{grid-template-columns:1fr}}
+.dot.win{background:rgba(0,120,215,.15);color:#4aa3ff}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px;position:relative;overflow:hidden}
 .card.highlight{border-color:var(--gold);box-shadow:0 0 0 1px rgba(230,180,80,.25),0 18px 50px -20px rgba(230,180,80,.35)}
 .plat{display:flex;align-items:center;gap:12px;margin-bottom:6px}
@@ -119,6 +120,23 @@ footer a{color:var(--muted)}
       <p class="note"><b>Device not registered?</b> Ad-hoc installs only work on devices we've added. Send your UDID (Safari → <b>get.udid.io</b>) and we'll enable it.</p>
     </div>
 
+    <!-- WINDOWS -->
+    <div class="card" id="card-win">
+      <div class="plat">
+        <span class="dot win">⊞</span>
+        <span class="os">Windows</span>
+        <span class="pill">Desktop · Full terminal</span>
+      </div>
+      <p class="desc">The full desktop terminal with pro charts, order ticket and the Demo/Live switch.</p>
+      <a class="btn gold" id="btn-win" href="https://github.com/YNW1606/atrion-releases/releases/download/v2.0.1-demo/ATRION-Setup-2.0.1.exe">⬇ Download for Windows</a>
+      <div class="ver">Version 2.0.1 · Windows 10/11 (64-bit)</div>
+      <ol class="steps">
+        <li>Download and run <b>ATRION-Setup-2.0.1.exe</b>.</li>
+        <li>If Windows SmartScreen appears, click <b>More info → Run anyway</b>.</li>
+        <li>Open <b>ATRION</b>, sign in, and switch to <b>Demo</b> to trade your $100k account.</li>
+      </ol>
+    </div>
+
   </div>
 
   <div class="banner">
@@ -141,6 +159,7 @@ footer a{color:var(--muted)}
   var isAndroid = /Android/.test(ua);
   if(isIOS){ document.getElementById('card-ios').classList.add('highlight'); }
   else if(isAndroid){ document.getElementById('card-android').classList.add('highlight'); }
+  else if(/Win/.test(navigator.platform||navigator.userAgent)){ document.getElementById('card-win').classList.add('highlight'); }
 })();
 </script>
 </body>
