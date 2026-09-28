@@ -1,1 +1,1 @@
-https://thus-upload-guardian-accompanied.trycloudflare.com
+https://api.trycloudflare.com
