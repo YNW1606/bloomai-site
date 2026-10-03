@@ -1,1 +1,1 @@
-https://capital-effectively-bottles-parts.trycloudflare.com
+https://api.trycloudflare.com
