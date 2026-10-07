@@ -1,1 +1,1 @@
-https://inch-integrity-immunology-teddy.trycloudflare.com
+https://api.trycloudflare.com
