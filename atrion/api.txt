@@ -1,1 +1,1 @@
-https://scotia-assessments-adequate-stunning.trycloudflare.com
+https://api.trycloudflare.com
