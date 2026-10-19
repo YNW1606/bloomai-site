@@ -1,1 +1,1 @@
-https://approaches-camp-planets-italic.trycloudflare.com
+https://api.trycloudflare.com
