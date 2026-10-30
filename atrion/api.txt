@@ -1,1 +1,1 @@
-https://ecological-housewares-messaging-kinds.trycloudflare.com
+https://api.trycloudflare.com
