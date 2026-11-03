@@ -1,1 +1,1 @@
-https://diamond-planner-hwy-firms.trycloudflare.com
+https://api.trycloudflare.com
