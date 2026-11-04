@@ -1,1 +1,1 @@
-https://api.trycloudflare.com
+https://secrets-album-magical-promoting.trycloudflare.com
