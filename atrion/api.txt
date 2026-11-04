@@ -1,1 +1,1 @@
-https://shaped-deny-recommended-believes.trycloudflare.com
+https://api.trycloudflare.com
