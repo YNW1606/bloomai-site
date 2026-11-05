@@ -1,1 +1,1 @@
-https://lay-lightbox-favor-handhelds.trycloudflare.com
+https://api.trycloudflare.com
