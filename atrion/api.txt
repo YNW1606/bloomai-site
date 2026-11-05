@@ -1,1 +1,1 @@
-https://wallet-george-selected-seat.trycloudflare.com
+https://api.trycloudflare.com
