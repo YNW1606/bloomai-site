@@ -1,1 +1,1 @@
-https://kathy-barn-gmbh-phys.trycloudflare.com
+https://api.trycloudflare.com
