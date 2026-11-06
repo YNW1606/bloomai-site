@@ -1,1 +1,1 @@
-https://api.trycloudflare.com
+https://bishop-fortune-furnished-wow.trycloudflare.com
