@@ -1,1 +1,1 @@
-https://atrion.loca.lt
+https://atrion-api-production.up.railway.app
