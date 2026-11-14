@@ -88,6 +88,81 @@ header{
 .stat-chip .val.red{color:#ff6b6b}
 .stat-chip .sub{font-size:10px;color:var(--muted);margin-top:1px}
 
+/* ── TRADE LOG TOGGLE ────────────────────────────────────── */
+.log-toggle-btn{
+  display:flex;flex-direction:column;padding:8px 20px;
+  border-right:1px solid var(--line);flex-shrink:0;
+  cursor:pointer;user-select:none;
+  border-left:1px solid rgba(0,212,170,.2);
+  background:rgba(0,212,170,.04);
+  transition:background .15s;
+}
+.log-toggle-btn:hover{background:rgba(0,212,170,.1)}
+.log-toggle-btn .lbl{font-size:10px;color:var(--green);text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px}
+.log-toggle-btn .val{font-size:13px;font-weight:700;color:var(--green)}
+
+/* ── TRADE DRAWER ────────────────────────────────────────── */
+.trade-drawer{
+  flex-shrink:0;max-height:0;overflow:hidden;
+  transition:max-height .35s ease;
+  background:var(--navy2);border-bottom:1px solid var(--line);
+}
+.trade-drawer.open{max-height:46vh}
+.trade-drawer-inner{
+  padding:10px 16px 12px;
+  overflow-y:auto;max-height:46vh;
+}
+.trade-drawer-inner::-webkit-scrollbar{width:4px}
+.trade-drawer-inner::-webkit-scrollbar-track{background:transparent}
+.trade-drawer-inner::-webkit-scrollbar-thumb{background:var(--line);border-radius:2px}
+
+/* day headers */
+.td-day{
+  display:flex;align-items:center;gap:10px;
+  padding:7px 10px;margin-top:10px;
+  background:linear-gradient(90deg,#0f1f38,#0d1526);
+  border-radius:7px;border:1px solid rgba(0,212,170,.18);
+  font-size:12px;
+}
+.td-day:first-child{margin-top:0}
+.td-day-date{font-weight:700;color:#fff;min-width:98px;flex-shrink:0}
+.td-day-badges{display:flex;gap:7px;flex-wrap:wrap}
+.td-b{font-size:10px;font-weight:600;padding:1px 7px;border-radius:4px}
+.td-b.td-total{background:rgba(255,255,255,.07);color:#c0cfe0}
+.td-b.td-win{background:rgba(0,212,170,.12);color:#00d4aa;border:1px solid rgba(0,212,170,.25)}
+.td-b.td-loss{background:rgba(255,107,107,.12);color:#ff6b6b;border:1px solid rgba(255,107,107,.25)}
+.td-b.td-pend{background:rgba(255,255,255,.05);color:#8095a8}
+
+/* signal rows */
+.td-row{
+  display:grid;
+  grid-template-columns:46px 60px 50px 90px 36px 76px 54px;
+  align-items:center;gap:8px;
+  padding:5px 10px 5px 22px;border-radius:5px;font-size:11px;
+  border-left:2px solid transparent;
+}
+.td-row:hover{background:rgba(255,255,255,.025)}
+.td-win-row{border-left-color:rgba(0,212,170,.5)}
+.td-loss-row{border-left-color:rgba(255,107,107,.5)}
+.td-pend-row{border-left-color:rgba(128,149,168,.3)}
+.td-time{color:var(--muted);font-family:monospace}
+.td-sym{font-weight:700;font-size:12px;color:#fff}
+.td-long{color:var(--green);font-weight:700}
+.td-short{color:#ff6b6b;font-weight:700}
+.td-score{color:var(--muted);font-family:monospace}
+.td-tier{font-size:10px}
+.td-oc-win{color:var(--green);font-weight:700}
+.td-oc-loss{color:#ff6b6b;font-weight:700}
+.td-oc-pend{color:var(--muted)}
+.td-ret-pos{color:var(--green);font-weight:600;font-family:monospace}
+.td-ret-neg{color:#ff6b6b;font-weight:600;font-family:monospace}
+.td-ret-na{color:var(--muted);font-family:monospace}
+
+@media(max-width:600px){
+  .td-row{grid-template-columns:40px 1fr 46px 70px 46px}
+  .td-score,.td-tier{display:none}
+}
+
 /* ── FRAME ───────────────────────────────────────────────── */
 .frame-wrap{flex:1;position:relative;overflow:hidden}
 iframe#dash{
@@ -187,6 +262,17 @@ iframe#dash{
     <div class="val" id="st-eng">—</div>
     <div class="sub">of 6 running</div>
   </div>
+  <div class="log-toggle-btn" id="logToggleBtn" onclick="toggleTradeLog()">
+    <div class="lbl">Trade Log</div>
+    <div class="val" id="logToggleLabel">▼ Show</div>
+  </div>
+</div>
+
+<!-- TRADE LOG DRAWER -->
+<div class="trade-drawer" id="tradeDrawer">
+  <div class="trade-drawer-inner" id="tradeLogContent">
+    <div style="color:var(--muted);font-size:12px;padding:8px 0">Loading trade history…</div>
+  </div>
 </div>
 
 <!-- DASHBOARD IFRAME -->
@@ -211,8 +297,8 @@ iframe#dash{
   <span>5-Engine Institutional Crypto</span>
   <span class="sep">|</span>
   Last refreshed: <span id="last-refresh">—</span>
-  <a href="https://ynw1606.github.io/UNIVERSAL_CRYPTO_ARB/" target="_blank" class="open-btn">
-    ↗ Open full page
+  <a href="#" onclick="document.getElementById('dash').requestFullscreen&&document.getElementById('dash').requestFullscreen();return false;" class="open-btn">
+    ↗ Fullscreen
   </a>
 </div>
 
@@ -308,6 +394,104 @@ iframe#dash{
 
   loadStats();
   setInterval(loadStats, 10000); // refresh stats every 10s
+
+  // ── TRADE LOG DRAWER ──────────────────────────────────────
+  let logLoaded = false;
+  let logOpen   = false;
+
+  window.toggleTradeLog = function(){
+    logOpen = !logOpen;
+    const drawer = document.getElementById('tradeDrawer');
+    const label  = document.getElementById('logToggleLabel');
+    if(logOpen){
+      drawer.classList.add('open');
+      label.textContent = '▲ Hide';
+      if(!logLoaded){ loadTradeLog(); logLoaded = true; }
+    } else {
+      drawer.classList.remove('open');
+      label.textContent = '▼ Show';
+    }
+  };
+
+  async function loadTradeLog(){
+    const el = document.getElementById('tradeLogContent');
+    try {
+      const data = await tryFetch('signals_history.json');
+      const signals = data.signals || [];
+      if(!signals.length){
+        el.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:8px 0">No signals logged yet.</div>';
+        return;
+      }
+
+      // Group by UTC date (YYYY-MM-DD)
+      const days = {};
+      const dayOrder = [];
+      for(const s of signals){
+        const ts  = s.timestamp || '';
+        const day = ts.includes('T') ? ts.slice(0,10) : ts.slice(0,10);
+        if(!days[day]){ days[day] = []; dayOrder.push(day); }
+        days[day].push(s);
+      }
+
+      let html = '';
+      for(const day of dayOrder){
+        const sigs     = days[day];
+        const resolved = sigs.filter(s => s.outcome !== 'PENDING');
+        const wins     = resolved.filter(s => s.outcome === 'WIN');
+        const losses   = resolved.filter(s => s.outcome === 'LOSS');
+        const pend     = sigs.filter(s => s.outcome === 'PENDING');
+        const wr       = resolved.length ? (wins.length / resolved.length * 100) : 0;
+        const rets     = resolved.map(s => s.return_pct || 0);
+        const avg      = rets.length ? rets.reduce((a,b)=>a+b,0)/rets.length : 0;
+        const wrColor  = wr >= 55 ? 'var(--green)' : (wr >= 45 ? 'var(--gold)' : '#ff6b6b');
+        const avgColor = avg >= 0 ? 'var(--green)' : '#ff6b6b';
+
+        const pendBadge = pend.length ? `<span class="td-b td-pend">${pend.length} pending</span>` : '';
+        const wrBadge   = resolved.length ? `<span class="td-b" style="color:${wrColor}">${wr.toFixed(0)}% WR</span>` : '';
+        const avgBadge  = resolved.length ? `<span class="td-b" style="color:${avgColor}">${avg>=0?'+':''}${avg.toFixed(2)}% avg</span>` : '';
+
+        html += `<div class="td-day">
+  <span class="td-day-date">📅 ${day}</span>
+  <span class="td-day-badges">
+    <span class="td-b td-total">${sigs.length} signals</span>
+    <span class="td-b td-win">▲ ${wins.length} WIN</span>
+    <span class="td-b td-loss">▼ ${losses.length} LOSS</span>
+    ${pendBadge}${wrBadge}${avgBadge}
+  </span>
+</div>`;
+
+        for(const s of sigs){
+          const ts    = s.timestamp || '';
+          const time  = ts.includes('T') ? ts.slice(11,16) : (ts.includes(' ') ? ts.split(' ')[1].slice(0,5) : ts.slice(11,16));
+          const sym   = (s.symbol||'?').replace('USDT','');
+          const dirn  = s.direction || '?';
+          const sc    = s.score || 0;
+          const oc    = s.outcome || 'PENDING';
+          const ret   = s.return_pct;
+          const dirCls = dirn === 'LONG' ? 'td-long' : 'td-short';
+          const ocCls  = oc === 'WIN' ? 'td-oc-win' : (oc === 'LOSS' ? 'td-oc-loss' : 'td-oc-pend');
+          const rowCls = oc === 'WIN' ? 'td-win-row' : (oc === 'LOSS' ? 'td-loss-row' : 'td-pend-row');
+          const retStr = ret !== null && ret !== undefined ? (ret>=0?'+':'')+ret.toFixed(2)+'%' : '—';
+          const retCls = ret===null||ret===undefined ? 'td-ret-na' : (ret>0?'td-ret-pos':'td-ret-neg');
+          const tierMap = {PERFECT:'★★★',HIGH:'★★',MODERATE:'★',MONITORING:'○'};
+          const tierTxt = tierMap[s.tier||''] || '';
+
+          html += `<div class="td-row ${rowCls}">
+  <span class="td-time">${time}</span>
+  <span class="td-sym">${sym}</span>
+  <span class="${dirCls}">${dirn}</span>
+  <span class="td-tier">${tierTxt} ${s.tier||''}</span>
+  <span class="td-score">${sc>=0?'+':''}${sc}</span>
+  <span class="${ocCls}">${oc}</span>
+  <span class="${retCls}">${retStr}</span>
+</div>`;
+        }
+      }
+      el.innerHTML = html;
+    } catch(e) {
+      el.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:8px 0">Could not load trade history.</div>';
+    }
+  }
 })();
 </script>
 </body>
