@@ -43,7 +43,7 @@ header{
   background:linear-gradient(90deg,#07101e,#0a152b);
 }
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-.logo svg{width:28px;height:28px}
+.logo img{width:32px;height:32px;border-radius:7px}
 .logo-text{font-size:15px;font-weight:700;color:#fff;letter-spacing:.3px}
 .logo-text span{color:var(--gold)}
 .nav-links{display:flex;align-items:center;gap:4px;margin-left:auto}
@@ -141,13 +141,7 @@ iframe#dash{
 <!-- HEADER -->
 <header>
   <a href="/" class="logo">
-    <!-- BloomAI wordmark SVG (matches favicon) -->
-    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="16" cy="16" r="15" fill="#0a152b" stroke="#e6b450" stroke-width="1.5"/>
-      <path d="M9 10h6a4 4 0 010 8H9V10z" fill="#e6b450"/>
-      <path d="M9 18h7a4 4 0 010 8H9V18z" fill="#e6b450" opacity=".6"/>
-      <circle cx="23" cy="10" r="2" fill="#00d4aa"/>
-    </svg>
+    <img src="/favicon.svg" alt="BloomAI">
     <span class="logo-text">Bloom<span>AI</span></span>
   </a>
   <nav class="nav-links">
