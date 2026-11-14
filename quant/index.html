@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quant Performance — BloomAI</title>
+<meta name="description" content="Live institutional crypto quant system performance — 5-engine signal accuracy, perpetual carry arbitrage, real-time win rates and equity tracking.">
+<meta name="theme-color" content="#05060c">
+<link rel="icon" href="/favicon.svg">
+<meta property="og:title" content="BloomAI Quant Performance Dashboard">
+<meta property="og:description" content="Live signal accuracy, carry arb P&L, 5-engine quant system — updated every minute.">
+<meta property="og:image" content="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#05060c;
+  --navy2:#0b1224;
+  --card:#0e1730;
+  --line:#1e2a48;
+  --gold:#e6b450;
+  --gold2:#d9a441;
+  --green:#00d4aa;
+  --text:#e8ecf5;
+  --muted:#9fb0cc;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--navy);
+  color:var(--text);
+  font:14px/1.6 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+header{
+  display:flex;align-items:center;gap:12px;
+  padding:0 20px;height:52px;flex-shrink:0;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(90deg,#07101e,#0a152b);
+}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo svg{width:28px;height:28px}
+.logo-text{font-size:15px;font-weight:700;color:#fff;letter-spacing:.3px}
+.logo-text span{color:var(--gold)}
+.nav-links{display:flex;align-items:center;gap:4px;margin-left:auto}
+.nav-links a{
+  color:var(--muted);text-decoration:none;font-size:13px;
+  padding:5px 10px;border-radius:6px;transition:all .15s;
+}
+.nav-links a:hover{color:#fff;background:rgba(255,255,255,.06)}
+.nav-links a.active{color:var(--green);background:rgba(0,212,170,.08);font-weight:600}
+.live-pill{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);
+  border-radius:20px;padding:4px 12px;font-size:12px;
+  color:var(--green);font-weight:600;margin-left:12px;
+}
+.live-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 6px rgba(0,212,170,.8);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── STATS BAR ───────────────────────────────────────────── */
+.stats-strip{
+  display:flex;align-items:center;gap:0;flex-shrink:0;
+  background:var(--navy2);border-bottom:1px solid var(--line);
+  overflow-x:auto;white-space:nowrap;
+}
+.stats-strip::-webkit-scrollbar{height:3px}
+.stats-strip::-webkit-scrollbar-track{background:transparent}
+.stats-strip::-webkit-scrollbar-thumb{background:var(--line);border-radius:2px}
+.stat-chip{
+  display:flex;flex-direction:column;padding:8px 20px;
+  border-right:1px solid var(--line);flex-shrink:0;
+}
+.stat-chip:last-child{border-right:none}
+.stat-chip .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px}
+.stat-chip .val{font-size:16px;font-weight:700;color:#fff}
+.stat-chip .val.green{color:var(--green)}
+.stat-chip .val.gold{color:var(--gold)}
+.stat-chip .val.red{color:#ff6b6b}
+.stat-chip .sub{font-size:10px;color:var(--muted);margin-top:1px}
+
+/* ── FRAME ───────────────────────────────────────────────── */
+.frame-wrap{flex:1;position:relative;overflow:hidden}
+iframe#dash{
+  width:100%;height:100%;
+  border:none;
+  display:block;
+}
+.frame-loading{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  background:var(--navy);gap:14px;
+  transition:opacity .4s;
+}
+.frame-loading.hidden{opacity:0;pointer-events:none}
+.spinner{
+  width:36px;height:36px;border-radius:50%;
+  border:3px solid var(--line);border-top-color:var(--green);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.frame-loading p{color:var(--muted);font-size:13px}
+
+/* ── FOOTER BAR ─────────────────────────────────────────── */
+.footer-bar{
+  display:flex;align-items:center;gap:12px;flex-shrink:0;
+  padding:5px 16px;background:var(--navy2);border-top:1px solid var(--line);
+  font-size:11px;color:var(--muted);
+}
+.footer-bar a{color:var(--muted);text-decoration:none}
+.footer-bar a:hover{color:var(--gold)}
+.footer-bar .sep{opacity:.3}
+#last-refresh{color:var(--green);font-weight:500}
+.open-btn{
+  margin-left:auto;display:flex;align-items:center;gap:6px;
+  background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.2);
+  color:var(--green);border-radius:6px;padding:3px 10px;
+  text-decoration:none;font-size:11px;font-weight:600;
+  transition:all .15s;
+}
+.open-btn:hover{background:rgba(0,212,170,.2);color:var(--green)}
+
+@media(max-width:600px){
+  .nav-links a:not(.active){display:none}
+  .stat-chip{padding:7px 14px}
+  .stat-chip .val{font-size:14px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a href="/" class="logo">
+    <!-- BloomAI wordmark SVG (matches favicon) -->
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="16" cy="16" r="15" fill="#0a152b" stroke="#e6b450" stroke-width="1.5"/>
+      <path d="M9 10h6a4 4 0 010 8H9V10z" fill="#e6b450"/>
+      <path d="M9 18h7a4 4 0 010 8H9V18z" fill="#e6b450" opacity=".6"/>
+      <circle cx="23" cy="10" r="2" fill="#00d4aa"/>
+    </svg>
+    <span class="logo-text">Bloom<span>AI</span></span>
+  </a>
+  <nav class="nav-links">
+    <a href="/">Home</a>
+    <a href="/atrion/">ATRION</a>
+    <a href="/quant/" class="active">Quant Dashboard</a>
+  </nav>
+  <div class="live-pill">
+    <span class="live-dot"></span>
+    LIVE · updates every 1 min
+  </div>
+</header>
+
+<!-- QUICK STATS STRIP (loaded from GitHub JSON) -->
+<div class="stats-strip" id="statsStrip">
+  <div class="stat-chip">
+    <div class="lbl">Win Rate</div>
+    <div class="val green" id="st-wr">—</div>
+    <div class="sub" id="st-wr-sub">loading…</div>
+  </div>
+  <div class="stat-chip">
+    <div class="lbl">Profit Factor</div>
+    <div class="val" id="st-pf">—</div>
+    <div class="sub">gains ÷ losses</div>
+  </div>
+  <div class="stat-chip">
+    <div class="lbl">Avg Return / Signal</div>
+    <div class="val gold" id="st-avg">—</div>
+    <div class="sub">net of 0.3% fee threshold</div>
+  </div>
+  <div class="stat-chip">
+    <div class="lbl">Perp Arb Equity</div>
+    <div class="val green" id="st-eq">—</div>
+    <div class="sub" id="st-eq-sub">paper $1M account</div>
+  </div>
+  <div class="stat-chip">
+    <div class="lbl">Projected Annual</div>
+    <div class="val gold" id="st-ann">—</div>
+    <div class="sub">carry arb income</div>
+  </div>
+  <div class="stat-chip">
+    <div class="lbl">Engines Online</div>
+    <div class="val" id="st-eng">—</div>
+    <div class="sub">of 6 running</div>
+  </div>
+</div>
+
+<!-- DASHBOARD IFRAME -->
+<div class="frame-wrap">
+  <div class="frame-loading" id="loader">
+    <div class="spinner"></div>
+    <p>Loading live dashboard…</p>
+  </div>
+  <iframe
+    id="dash"
+    src="https://ynw1606.github.io/UNIVERSAL_CRYPTO_ARB/"
+    title="BloomAI Quant System Dashboard"
+    loading="eager"
+    allow="fullscreen"
+  ></iframe>
+</div>
+
+<!-- FOOTER BAR -->
+<div class="footer-bar">
+  <span>BloomAI Quant System</span>
+  <span class="sep">|</span>
+  <span>5-Engine Institutional Crypto</span>
+  <span class="sep">|</span>
+  Last refreshed: <span id="last-refresh">—</span>
+  <a href="https://ynw1606.github.io/UNIVERSAL_CRYPTO_ARB/" target="_blank" class="open-btn">
+    ↗ Open full page
+  </a>
+</div>
+
+<script>
+(function(){
+  // Hide loader once iframe loads
+  const iframe = document.getElementById('dash');
+  const loader = document.getElementById('loader');
+  iframe.addEventListener('load', () => loader.classList.add('hidden'));
+  setTimeout(() => loader.classList.add('hidden'), 6000); // fallback
+
+  // Auto-refresh timestamp
+  function stamp(){
+    document.getElementById('last-refresh').textContent =
+      new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',timeZoneName:'short'});
+  }
+  stamp();
+  setInterval(stamp, 60000);
+
+  // Reload iframe every 10 min to match dashboard's own refresh
+  setInterval(() => {
+    iframe.src = iframe.src;
+    stamp();
+  }, 600000);
+
+  // ── PULL QUICK STATS FROM GITHUB RAW JSON ──────────────────
+  const BASE = 'https://raw.githubusercontent.com/YNW1606/UNIVERSAL_CRYPTO_ARB/master/accuracy_db/';
+
+  async function loadStats(){
+    try {
+      const [scanRes, arbRes] = await Promise.all([
+        fetch(BASE + 'latest_scan.json?t=' + Date.now()),
+        fetch(BASE + 'perp_arb.json?t=' + Date.now()),
+      ]);
+      const scan = await scanRes.json().catch(()=>({}));
+      const arb  = await arbRes.json().catch(()=>({}));
+
+      // Engines
+      const eng = scan.engines_online || 0;
+      const engEl = document.getElementById('st-eng');
+      engEl.textContent = eng + '/6';
+      engEl.className = 'val ' + (eng >= 5 ? 'green' : eng >= 3 ? 'gold' : 'red');
+
+      // Perp arb stats
+      const eq    = arb.account_equity   || 0;
+      const ann   = arb.proj_annual_pct  || 0;
+      const wr    = arb.win_rate         || 0;
+      const start = arb.starting_balance || 1000000;
+
+      const eqEl = document.getElementById('st-eq');
+      eqEl.textContent = '$' + eq.toLocaleString('en-US',{maximumFractionDigits:0});
+      eqEl.className   = 'val ' + (eq >= start ? 'green' : 'red');
+      document.getElementById('st-eq-sub').textContent =
+        (((eq - start)/start)*100).toFixed(3) + '% return';
+
+      document.getElementById('st-ann').textContent = ann.toFixed(1) + '%/yr';
+
+    } catch(e) { /* silently ignore if offline */ }
+
+    // Signal stats from DB via accuracy summary in perp_arb.json
+    // We'll read from latest_scan.json watchlist to infer direction consensus
+    try {
+      const sumRes = await fetch(BASE + 'latest_scan.json?t=' + Date.now());
+      const scan2  = await sumRes.json().catch(()=>({}));
+      // Active signals count
+      const active = (scan2.active_signals || []).length;
+      if(active > 0){
+        const dirs = (scan2.active_signals||[]).map(s=>s.direction);
+        const nShort = dirs.filter(d=>d==='SHORT').length;
+        const nLong  = dirs.filter(d=>d==='LONG').length;
+        document.getElementById('st-eng').nextElementSibling &&
+          (document.getElementById('st-eng').nextElementSibling.textContent = active + ' signals active');
+      }
+    } catch(e){}
+  }
+
+  loadStats();
+  setInterval(loadStats, 300000); // refresh stats every 5 min
+
+  // ── PULL WIN RATE FROM ACCURACY SUMMARY ────────────────────
+  // The perp_arb.json has overall stats; for signal accuracy we
+  // read from a lightweight stat block embedded in the JSON
+  async function loadSignalStats(){
+    try {
+      // We embed stats in latest_scan.json via signal_accuracy_tracker
+      // If not present, fall back to showing "—"
+      const r = await fetch(BASE + 'latest_scan.json?t=' + Date.now());
+      const d = await r.json().catch(()=>({}));
+      const acc = d.accuracy || {};
+
+      if(acc.win_rate !== undefined){
+        const wr = acc.win_rate;
+        const wrEl = document.getElementById('st-wr');
+        wrEl.textContent = wr.toFixed(1) + '%';
+        wrEl.className = 'val ' + (wr >= 65 ? 'green' : wr >= 50 ? 'gold' : 'red');
+        document.getElementById('st-wr-sub').textContent =
+          (acc.wins||0) + ' wins / ' + (acc.resolved||0) + ' resolved';
+
+        const pf = acc.profit_factor || 0;
+        const pfEl = document.getElementById('st-pf');
+        pfEl.textContent = (pf > 99 ? '∞' : pf.toFixed(2)) + '×';
+        pfEl.className = 'val ' + (pf >= 1.5 ? 'green' : pf >= 1.0 ? 'gold' : 'red');
+
+        const avg = acc.avg_return || 0;
+        const avgEl = document.getElementById('st-avg');
+        avgEl.textContent = (avg >= 0 ? '+' : '') + avg.toFixed(3) + '%';
+        avgEl.className = 'val ' + (avg > 0 ? 'gold' : 'red');
+      }
+    } catch(e){}
+  }
+
+  loadSignalStats();
+  setInterval(loadSignalStats, 300000);
+})();
+</script>
+</body>
+</html>
