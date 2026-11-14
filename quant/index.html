@@ -238,77 +238,39 @@ iframe#dash{
   stamp();
   setInterval(stamp, 60000);
 
-  // Reload iframe every 10 min to match dashboard's own refresh
+  // Reload iframe every 60s so dashboard stays current
   setInterval(() => {
     iframe.src = iframe.src;
     stamp();
-  }, 600000);
+  }, 60000);
 
   // ── PULL QUICK STATS FROM GITHUB RAW JSON ──────────────────
-  const BASE = 'https://raw.githubusercontent.com/YNW1606/UNIVERSAL_CRYPTO_ARB/master/accuracy_db/';
+  // Uses main branch where the hourly workflow commits live data
+  const BASE_MAIN   = 'https://raw.githubusercontent.com/YNW1606/UNIVERSAL_CRYPTO_ARB/main/accuracy_db/';
+  const BASE_MASTER = 'https://raw.githubusercontent.com/YNW1606/UNIVERSAL_CRYPTO_ARB/master/accuracy_db/';
+
+  async function tryFetch(path){
+    // Try main first (hourly workflow commits here), fall back to master
+    try {
+      const r = await fetch(BASE_MAIN + path + '?t=' + Date.now());
+      if(r.ok) return r.json();
+    } catch(e){}
+    try {
+      const r = await fetch(BASE_MASTER + path + '?t=' + Date.now());
+      if(r.ok) return r.json();
+    } catch(e){}
+    return {};
+  }
 
   async function loadStats(){
     try {
-      const [scanRes, arbRes] = await Promise.all([
-        fetch(BASE + 'latest_scan.json?t=' + Date.now()),
-        fetch(BASE + 'perp_arb.json?t=' + Date.now()),
+      const [scan, arb] = await Promise.all([
+        tryFetch('latest_scan.json'),
+        tryFetch('perp_arb.json'),
       ]);
-      const scan = await scanRes.json().catch(()=>({}));
-      const arb  = await arbRes.json().catch(()=>({}));
 
-      // Engines
-      const eng = scan.engines_online || 0;
-      const engEl = document.getElementById('st-eng');
-      engEl.textContent = eng + '/6';
-      engEl.className = 'val ' + (eng >= 5 ? 'green' : eng >= 3 ? 'gold' : 'red');
-
-      // Perp arb stats
-      const eq    = arb.account_equity   || 0;
-      const ann   = arb.proj_annual_pct  || 0;
-      const wr    = arb.win_rate         || 0;
-      const start = arb.starting_balance || 1000000;
-
-      const eqEl = document.getElementById('st-eq');
-      eqEl.textContent = '$' + eq.toLocaleString('en-US',{maximumFractionDigits:0});
-      eqEl.className   = 'val ' + (eq >= start ? 'green' : 'red');
-      document.getElementById('st-eq-sub').textContent =
-        (((eq - start)/start)*100).toFixed(3) + '% return';
-
-      document.getElementById('st-ann').textContent = ann.toFixed(1) + '%/yr';
-
-    } catch(e) { /* silently ignore if offline */ }
-
-    // Signal stats from DB via accuracy summary in perp_arb.json
-    // We'll read from latest_scan.json watchlist to infer direction consensus
-    try {
-      const sumRes = await fetch(BASE + 'latest_scan.json?t=' + Date.now());
-      const scan2  = await sumRes.json().catch(()=>({}));
-      // Active signals count
-      const active = (scan2.active_signals || []).length;
-      if(active > 0){
-        const dirs = (scan2.active_signals||[]).map(s=>s.direction);
-        const nShort = dirs.filter(d=>d==='SHORT').length;
-        const nLong  = dirs.filter(d=>d==='LONG').length;
-        document.getElementById('st-eng').nextElementSibling &&
-          (document.getElementById('st-eng').nextElementSibling.textContent = active + ' signals active');
-      }
-    } catch(e){}
-  }
-
-  loadStats();
-  setInterval(loadStats, 300000); // refresh stats every 5 min
-
-  // ── PULL WIN RATE FROM ACCURACY SUMMARY ────────────────────
-  // The perp_arb.json has overall stats; for signal accuracy we
-  // read from a lightweight stat block embedded in the JSON
-  async function loadSignalStats(){
-    try {
-      // We embed stats in latest_scan.json via signal_accuracy_tracker
-      // If not present, fall back to showing "—"
-      const r = await fetch(BASE + 'latest_scan.json?t=' + Date.now());
-      const d = await r.json().catch(()=>({}));
-      const acc = d.accuracy || {};
-
+      // ── Signal accuracy (from accuracy block in latest_scan.json) ──
+      const acc = scan.accuracy || {};
       if(acc.win_rate !== undefined){
         const wr = acc.win_rate;
         const wrEl = document.getElementById('st-wr');
@@ -319,19 +281,39 @@ iframe#dash{
 
         const pf = acc.profit_factor || 0;
         const pfEl = document.getElementById('st-pf');
-        pfEl.textContent = (pf > 99 ? '∞' : pf.toFixed(2)) + '×';
+        pfEl.textContent = (pf >= 999 ? '∞' : pf.toFixed(2)) + '×';
         pfEl.className = 'val ' + (pf >= 1.5 ? 'green' : pf >= 1.0 ? 'gold' : 'red');
 
         const avg = acc.avg_return || 0;
         const avgEl = document.getElementById('st-avg');
-        avgEl.textContent = (avg >= 0 ? '+' : '') + avg.toFixed(3) + '%';
+        avgEl.textContent = (avg >= 0 ? '+' : '') + (avg/100).toFixed(3) + '%';
         avgEl.className = 'val ' + (avg > 0 ? 'gold' : 'red');
       }
-    } catch(e){}
+
+      // ── Engines online ──
+      const eng = scan.engines_online || 0;
+      const engEl = document.getElementById('st-eng');
+      engEl.textContent = eng + '/6';
+      engEl.className = 'val ' + (eng >= 5 ? 'green' : eng >= 3 ? 'gold' : 'red');
+
+      // ── Perp arb (from perp_arb.json) ──
+      const eq    = arb.account_equity   || 0;
+      const ann   = arb.proj_annual_pct  || 0;
+      const start = arb.starting_balance || 1000000;
+      if(eq > 0){
+        const eqEl = document.getElementById('st-eq');
+        eqEl.textContent = '$' + eq.toLocaleString('en-US',{maximumFractionDigits:0});
+        eqEl.className   = 'val ' + (eq >= start ? 'green' : 'red');
+        document.getElementById('st-eq-sub').textContent =
+          (((eq - start)/start)*100).toFixed(3) + '% return';
+        document.getElementById('st-ann').textContent = ann.toFixed(1) + '%/yr';
+      }
+
+    } catch(e) { /* silently ignore if offline */ }
   }
 
-  loadSignalStats();
-  setInterval(loadSignalStats, 300000);
+  loadStats();
+  setInterval(loadStats, 10000); // refresh stats every 10s
 })();
 </script>
 </body>
