@@ -284,9 +284,9 @@ iframe#dash{
         pfEl.textContent = (pf >= 999 ? '∞' : pf.toFixed(2)) + '×';
         pfEl.className = 'val ' + (pf >= 1.5 ? 'green' : pf >= 1.0 ? 'gold' : 'red');
 
-        const avg = acc.avg_return || 0;
+        const avg = acc.avg_return || 0;  // already in % (e.g. 1.514 = 1.514%)
         const avgEl = document.getElementById('st-avg');
-        avgEl.textContent = (avg >= 0 ? '+' : '') + (avg/100).toFixed(3) + '%';
+        avgEl.textContent = (avg >= 0 ? '+' : '') + avg.toFixed(3) + '%';
         avgEl.className = 'val ' + (avg > 0 ? 'gold' : 'red');
       }
 
