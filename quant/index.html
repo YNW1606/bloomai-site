@@ -253,9 +253,9 @@ iframe#dash{
     <div class="sub" id="st-eq-sub">paper $1M account</div>
   </div>
   <div class="stat-chip">
-    <div class="lbl">Projected Annual</div>
+    <div class="lbl" id="st-ann-lbl">Projected Annual</div>
     <div class="val gold" id="st-ann">—</div>
-    <div class="sub">carry arb income</div>
+    <div class="sub" id="st-ann-sub">carry arb income</div>
   </div>
   <div class="stat-chip">
     <div class="lbl">Engines Online</div>
@@ -287,6 +287,7 @@ iframe#dash{
     title="BloomAI Quant System Dashboard"
     loading="eager"
     allow="fullscreen"
+    onload="(function(){var l=document.getElementById('loader');if(l){l.classList.add('hidden');setTimeout(function(){l.style.display='none'},450);}})()"
   ></iframe>
 </div>
 
@@ -304,11 +305,20 @@ iframe#dash{
 
 <script>
 (function(){
-  // Hide loader once iframe loads
+  // ── IFRAME LOADING OVERLAY ──────────────────────────────────
   const iframe = document.getElementById('dash');
   const loader = document.getElementById('loader');
-  iframe.addEventListener('load', () => loader.classList.add('hidden'));
-  setTimeout(() => loader.classList.add('hidden'), 6000); // fallback
+
+  function hideLoader(){
+    loader.classList.add('hidden');
+    // fully remove from layout after CSS transition (400ms)
+    setTimeout(() => { loader.style.display = 'none'; }, 450);
+  }
+
+  // onload fires when iframe content loads; also catch via attribute
+  iframe.addEventListener('load', hideLoader);
+  // Aggressive fallback: hide after 2.5s regardless
+  setTimeout(hideLoader, 2500);
 
   // Auto-refresh timestamp
   function stamp(){
@@ -320,17 +330,18 @@ iframe#dash{
 
   // Reload iframe every 60s so dashboard stays current
   setInterval(() => {
+    loader.style.display = '';  // show briefly while reloading
+    loader.classList.remove('hidden');
     iframe.src = iframe.src;
     stamp();
+    setTimeout(hideLoader, 2500);
   }, 60000);
 
   // ── PULL QUICK STATS FROM GITHUB RAW JSON ──────────────────
-  // Uses main branch where the hourly workflow commits live data
   const BASE_MAIN   = 'https://raw.githubusercontent.com/YNW1606/UNIVERSAL_CRYPTO_ARB/main/accuracy_db/';
   const BASE_MASTER = 'https://raw.githubusercontent.com/YNW1606/UNIVERSAL_CRYPTO_ARB/master/accuracy_db/';
 
   async function tryFetch(path){
-    // Try main first (hourly workflow commits here), fall back to master
     try {
       const r = await fetch(BASE_MAIN + path + '?t=' + Date.now());
       if(r.ok) return r.json();
@@ -349,7 +360,7 @@ iframe#dash{
         tryFetch('perp_arb.json'),
       ]);
 
-      // ── Signal accuracy (from accuracy block in latest_scan.json) ──
+      // ── Signal accuracy (from latest_scan.json accuracy block) ──
       const acc = scan.accuracy || {};
       if(acc.win_rate !== undefined){
         const wr = acc.win_rate;
@@ -364,7 +375,7 @@ iframe#dash{
         pfEl.textContent = (pf >= 999 ? '∞' : pf.toFixed(2)) + '×';
         pfEl.className = 'val ' + (pf >= 1.5 ? 'green' : pf >= 1.0 ? 'gold' : 'red');
 
-        const avg = acc.avg_return || 0;  // already in % (e.g. 1.514 = 1.514%)
+        const avg = acc.avg_return || 0;
         const avgEl = document.getElementById('st-avg');
         avgEl.textContent = (avg >= 0 ? '+' : '') + avg.toFixed(3) + '%';
         avgEl.className = 'val ' + (avg > 0 ? 'gold' : 'red');
@@ -377,16 +388,36 @@ iframe#dash{
       engEl.className = 'val ' + (eng >= 5 ? 'green' : eng >= 3 ? 'gold' : 'red');
 
       // ── Perp arb (from perp_arb.json) ──
-      const eq    = arb.account_equity   || 0;
-      const ann   = arb.proj_annual_pct  || 0;
-      const start = arb.starting_balance || 1000000;
+      const eq       = arb.account_equity   || 0;
+      const ann      = arb.proj_annual_pct  || 0;
+      const start    = arb.starting_balance || 1000000;
+      const nOpen    = arb.open_trades      || 0;
+      const rpnl     = arb.realized_pnl     || 0;
+
       if(eq > 0){
+        const retPct = ((eq - start) / start) * 100;
+
         const eqEl = document.getElementById('st-eq');
         eqEl.textContent = '$' + eq.toLocaleString('en-US',{maximumFractionDigits:0});
         eqEl.className   = 'val ' + (eq >= start ? 'green' : 'red');
         document.getElementById('st-eq-sub').textContent =
-          (((eq - start)/start)*100).toFixed(3) + '% return';
-        document.getElementById('st-ann').textContent = ann.toFixed(1) + '%/yr';
+          (retPct >= 0 ? '+' : '') + retPct.toFixed(3) + '% return · $' + rpnl.toFixed(0) + ' realized';
+
+        // Projected annual: show when positions open; show realized info otherwise
+        const annLbl = document.getElementById('st-ann-lbl');
+        const annEl  = document.getElementById('st-ann');
+        const annSub = document.getElementById('st-ann-sub');
+        if(ann > 0 && nOpen > 0){
+          if(annLbl) annLbl.textContent = 'Projected Annual';
+          annEl.textContent = ann.toFixed(1) + '%/yr';
+          annEl.className = 'val gold';
+          if(annSub) annSub.textContent = 'carry arb income · ' + nOpen + ' positions';
+        } else {
+          if(annLbl) annLbl.textContent = 'Arb P&L';
+          annEl.textContent = (rpnl >= 0 ? '+$' : '-$') + Math.abs(rpnl).toLocaleString('en-US',{maximumFractionDigits:0});
+          annEl.className = 'val ' + (rpnl >= 0 ? 'green' : 'red');
+          if(annSub) annSub.textContent = 'realized · redeploying positions';
+        }
       }
 
     } catch(e) { /* silently ignore if offline */ }
