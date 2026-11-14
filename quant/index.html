@@ -88,6 +88,29 @@ header{
 .stat-chip .val.red{color:#ff6b6b}
 .stat-chip .sub{font-size:10px;color:var(--muted);margin-top:1px}
 
+/* ── LIVE PRICE TICKER STRIP ─────────────────────────────── */
+.price-ticker{
+  display:flex;align-items:center;gap:0;
+  background:#0a1120;border-bottom:1px solid var(--line);
+  overflow-x:auto;white-space:nowrap;
+  font-size:12px;
+}
+.price-ticker::-webkit-scrollbar{height:2px}
+.price-ticker::-webkit-scrollbar-thumb{background:var(--line)}
+.price-item{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 18px;border-right:1px solid var(--line);
+  flex-shrink:0;
+}
+.price-item:last-child{border-right:none}
+.pi-sym{font-weight:700;color:#8095a8;font-size:10px;width:36px;letter-spacing:.4px}
+.pi-price{font-weight:700;color:#e2e8f0;font-variant-numeric:tabular-nums;min-width:68px}
+.pi-chg{font-size:10px;font-variant-numeric:tabular-nums;min-width:46px;text-align:right}
+.pi-chg.up{color:var(--green)}
+.pi-chg.dn{color:#ff6b6b}
+.pi-dot{width:5px;height:5px;border-radius:50%;background:#1e3a5f;flex-shrink:0;transition:background .3s}
+.pi-dot.flash{background:var(--green)}
+
 /* ── TRADE LOG TOGGLE ────────────────────────────────────── */
 .log-toggle-btn{
   display:flex;flex-direction:column;padding:8px 20px;
@@ -266,6 +289,20 @@ iframe#dash{
     <div class="lbl">Trade Log</div>
     <div class="val" id="logToggleLabel">▼ Show</div>
   </div>
+</div>
+
+<!-- LIVE PRICE TICKER STRIP (updates every 3s from Bybit) -->
+<div class="price-ticker" id="priceTicker">
+  <div class="price-item" data-sym="BTCUSDT"><span class="pi-dot" id="pd-BTCUSDT"></span><span class="pi-sym">BTC</span><span class="pi-price" id="pp-BTCUSDT">—</span><span class="pi-chg" id="pc-BTCUSDT"></span></div>
+  <div class="price-item" data-sym="ETHUSDT"><span class="pi-dot" id="pd-ETHUSDT"></span><span class="pi-sym">ETH</span><span class="pi-price" id="pp-ETHUSDT">—</span><span class="pi-chg" id="pc-ETHUSDT"></span></div>
+  <div class="price-item" data-sym="SOLUSDT"><span class="pi-dot" id="pd-SOLUSDT"></span><span class="pi-sym">SOL</span><span class="pi-price" id="pp-SOLUSDT">—</span><span class="pi-chg" id="pc-SOLUSDT"></span></div>
+  <div class="price-item" data-sym="BNBUSDT"><span class="pi-dot" id="pd-BNBUSDT"></span><span class="pi-sym">BNB</span><span class="pi-price" id="pp-BNBUSDT">—</span><span class="pi-chg" id="pc-BNBUSDT"></span></div>
+  <div class="price-item" data-sym="XRPUSDT"><span class="pi-dot" id="pd-XRPUSDT"></span><span class="pi-sym">XRP</span><span class="pi-price" id="pp-XRPUSDT">—</span><span class="pi-chg" id="pc-XRPUSDT"></span></div>
+  <div class="price-item" data-sym="DOGEUSDT"><span class="pi-dot" id="pd-DOGEUSDT"></span><span class="pi-sym">DOGE</span><span class="pi-price" id="pp-DOGEUSDT">—</span><span class="pi-chg" id="pc-DOGEUSDT"></span></div>
+  <div class="price-item" data-sym="AVAXUSDT"><span class="pi-dot" id="pd-AVAXUSDT"></span><span class="pi-sym">AVAX</span><span class="pi-price" id="pp-AVAXUSDT">—</span><span class="pi-chg" id="pc-AVAXUSDT"></span></div>
+  <div class="price-item" data-sym="DOTUSDT"><span class="pi-dot" id="pd-DOTUSDT"></span><span class="pi-sym">DOT</span><span class="pi-price" id="pp-DOTUSDT">—</span><span class="pi-chg" id="pc-DOTUSDT"></span></div>
+  <div class="price-item" data-sym="ADAUSDT"><span class="pi-dot" id="pd-ADAUSDT"></span><span class="pi-sym">ADA</span><span class="pi-price" id="pp-ADAUSDT">—</span><span class="pi-chg" id="pc-ADAUSDT"></span></div>
+  <div class="price-item" data-sym="SUIUSDT"><span class="pi-dot" id="pd-SUIUSDT"></span><span class="pi-sym">SUI</span><span class="pi-price" id="pp-SUIUSDT">—</span><span class="pi-chg" id="pc-SUIUSDT"></span></div>
 </div>
 
 <!-- TRADE LOG DRAWER -->
@@ -523,6 +560,63 @@ iframe#dash{
       el.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:8px 0">Could not load trade history.</div>';
     }
   }
+})();
+
+// ── LIVE PRICE TICKER ───────────────────────────────────────
+(function(){
+  const SYMS = ['BTCUSDT','ETHUSDT','SOLUSDT','BNBUSDT','XRPUSDT','DOGEUSDT','AVAXUSDT','DOTUSDT','ADAUSDT','SUIUSDT'];
+  let prevPrices = {};
+  let fetching = false;
+
+  function fmtPrice(p){
+    if(p >= 10000) return '$' + p.toLocaleString('en-US',{maximumFractionDigits:0});
+    if(p >= 100)   return '$' + p.toLocaleString('en-US',{maximumFractionDigits:2});
+    if(p >= 1)     return '$' + p.toFixed(4);
+    return '$' + p.toFixed(5);
+  }
+
+  async function fetchTicker(){
+    if(fetching) return;
+    fetching = true;
+    try {
+      const r = await fetch('https://api.bybit.com/v5/market/tickers?category=linear');
+      if(!r.ok) return;
+      const data = await r.json();
+      const list = data?.result?.list || [];
+      const map = {};
+      for(const t of list) map[t.symbol] = t;
+
+      for(const sym of SYMS){
+        const t = map[sym];
+        if(!t) continue;
+        const price = parseFloat(t.lastPrice);
+        const chg   = parseFloat(t.price24hPcnt) * 100;
+        const prev  = prevPrices[sym];
+
+        const pEl = document.getElementById('pp-' + sym);
+        const cEl = document.getElementById('pc-' + sym);
+        const dEl = document.getElementById('pd-' + sym);
+
+        if(pEl){
+          pEl.textContent = fmtPrice(price);
+          // Flash dot on price change
+          if(prev !== undefined && prev !== price && dEl){
+            dEl.classList.add('flash');
+            setTimeout(()=>dEl.classList.remove('flash'), 600);
+          }
+        }
+        if(cEl){
+          cEl.textContent = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
+          cEl.className = 'pi-chg ' + (chg >= 0 ? 'up' : 'dn');
+        }
+        prevPrices[sym] = price;
+      }
+    } catch(e){}
+    fetching = false;
+  }
+
+  fetchTicker();
+  setInterval(fetchTicker, 3000);
 })();
 </script>
 </body>
