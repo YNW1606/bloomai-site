@@ -23,5 +23,10 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Floating download button injected on all pages -->
+    <a href="/download" id="dl-fab" style="position:fixed;bottom:28px;right:28px;z-index:9999;display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,#e6b450,#c8912a);color:#0a0600;font-weight:700;font-size:14px;padding:12px 20px;border-radius:50px;text-decoration:none;box-shadow:0 6px 24px rgba(230,180,80,.45);transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 32px rgba(230,180,80,.55)'" onmouseout="this.style.transform='';this.style.boxShadow='0 6px 24px rgba(230,180,80,.45)'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download App
+    </a>
   </body>
 </html>

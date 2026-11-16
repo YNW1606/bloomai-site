@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Download — BloomAI &amp; ATRION</title>
+<meta name="description" content="Download BloomAI AI Trading Terminal for Windows, or ATRION for Windows, Android and iPhone.">
+<meta name="theme-color" content="#05060c">
+<link rel="icon" href="/favicon.svg">
+<style>
+:root{
+  --navy:#05060c; --navy2:#0b1224; --card:#0e1730; --line:#1e2a48;
+  --gold:#e6b450; --gold2:#d9a441; --text:#e8ecf5; --muted:#9fb0cc;
+  --green:#1eb980; --blue:#4aa3ff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:radial-gradient(1200px 700px at 50% -10%, #0e1c38 0%, var(--navy) 60%);color:var(--text);font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+a{color:var(--gold2);text-decoration:none}
+header{display:flex;align-items:center;gap:14px;padding:20px 24px;border-bottom:1px solid var(--line);max-width:1000px;margin:0 auto}
+header .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+header img{height:36px}
+header .brand{font-size:18px;font-weight:700;color:#fff}
+header .nav{margin-left:auto;display:flex;gap:20px}
+header .nav a{color:var(--muted);font-size:14px}
+header .nav a:hover{color:var(--gold)}
+.hero{text-align:center;padding:52px 24px 36px}
+.hero h1{font-size:36px;font-weight:800;color:#fff;letter-spacing:.3px;margin-bottom:10px}
+.hero p{color:var(--muted);max-width:520px;margin:0 auto;font-size:16px}
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px 90px}
+.section-title{font-size:13px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);margin:36px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px;position:relative;overflow:hidden}
+.card.highlight{border-color:var(--gold);box-shadow:0 0 0 1px rgba(230,180,80,.22),0 16px 46px -18px rgba(230,180,80,.30)}
+.card-head{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.icon.win{background:rgba(0,120,215,.15);color:#4aa3ff}
+.icon.and{background:rgba(61,220,132,.12);color:#3ddc84}
+.icon.ios{background:rgba(255,255,255,.08);color:#fff}
+.card-name{font-size:19px;font-weight:700;color:#fff}
+.card-ver{font-size:12px;color:var(--muted);margin-top:2px}
+.badge{font-size:10px;letter-spacing:.7px;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);padding:2px 8px;border-radius:999px;margin-left:auto}
+.desc{color:var(--muted);font-size:14px;margin:14px 0 20px;line-height:1.6}
+.btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:14px 20px;border-radius:12px;font-weight:700;font-size:15px;border:0;cursor:pointer;text-decoration:none;transition:filter .15s}
+.btn:hover{filter:brightness(1.1)}
+.btn.primary{background:linear-gradient(135deg,#e6b450,#c8912a);color:#0a0600}
+.btn.secondary{background:rgba(255,255,255,.07);color:#fff;border:1px solid var(--line)}
+.btn.android{background:linear-gradient(135deg,#2ecc71,#1a9950);color:#fff}
+.btn.ios{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.18)}
+.btn svg{width:18px;height:18px;flex-shrink:0}
+.note{font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
+.spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin-left:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+footer{text-align:center;padding:28px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="/">
+    <img src="/favicon.svg" alt="BloomAI">
+    <span class="brand">BloomAI</span>
+  </a>
+  <nav class="nav">
+    <a href="/">Home</a>
+    <a href="/atrion/">ATRION Mobile</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <h1>Download Our Apps</h1>
+  <p>Professional AI trading terminals for Windows desktop and mobile. Free to download.</p>
+</div>
+
+<div class="wrap">
+
+  <!-- BloomAI Desktop -->
+  <div class="section-title">BloomAI — AI Trading Terminal</div>
+  <div class="grid">
+    <div class="card highlight">
+      <div class="card-head">
+        <div class="icon win">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 12V6.75l6-1.25v6.5L3 12zm0 1l6 .313v6.312L3 18V13zm7-6.5l8-1.75V12H10V6.5zm0 5.5h8v6.75L10 19.25V12z"/></svg>
+        </div>
+        <div>
+          <div class="card-name">BloomAI Desktop</div>
+          <div class="card-ver" id="bloomai-ver">Windows 64-bit</div>
+        </div>
+        <span class="badge">FREE</span>
+      </div>
+      <p class="desc">10 self-evolving AI engines, live MT5 integration, 500+ instruments, Kelly sizing, voice assistant ARIA, institutional-grade analysis.</p>
+      <a id="bloomai-btn" class="btn primary" href="https://github.com/YNW1606/bloomai-releases/releases/latest" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download for Windows
+      </a>
+      <div class="note">Requires Windows 10/11 · 64-bit · ~290 MB</div>
+    </div>
+  </div>
+
+  <!-- ATRION Desktop + Mobile -->
+  <div class="section-title">ATRION — AI Powered Trades</div>
+  <div class="grid">
+    <div class="card highlight">
+      <div class="card-head">
+        <div class="icon win">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 12V6.75l6-1.25v6.5L3 12zm0 1l6 .313v6.312L3 18V13zm7-6.5l8-1.75V12H10V6.5zm0 5.5h8v6.75L10 19.25V12z"/></svg>
+        </div>
+        <div>
+          <div class="card-name">ATRION Desktop</div>
+          <div class="card-ver" id="atrion-win-ver">Windows 64-bit</div>
+        </div>
+        <span class="badge">FREE</span>
+      </div>
+      <p class="desc">Full ATRION trading terminal for Windows — live charts, AI signals, order management, voice ARIA assistant, and MT5 bridge.</p>
+      <a id="atrion-win-btn" class="btn primary" href="https://github.com/YNW1606/atrion-releases/releases/latest" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download for Windows
+      </a>
+      <div class="note">Requires Windows 10/11 · 64-bit · ~170 MB</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="icon and">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 2.001a.498.498 0 00-.398.199l-1.398 1.898A6.956 6.956 0 0012 3c-1.348 0-2.606.381-3.667 1.034L6.875 2.2A.498.498 0 006.08 2.1a.5.5 0 00.1.7l1.33 1.808A6.98 6.98 0 005 10h14a6.98 6.98 0 00-2.51-5.392L17.82 2.8a.5.5 0 00-.297-.799zM9 7.5a.5.5 0 110 1 .5.5 0 010-1zm6 0a.5.5 0 110 1 .5.5 0 010-1zM5 11v7a2 2 0 002 2h1v3a1 1 0 002 0v-3h4v3a1 1 0 002 0v-3h1a2 2 0 002-2v-7H5zM2 11a1 1 0 00-1 1v5a1 1 0 002 0v-5a1 1 0 00-1-1zm20 0a1 1 0 00-1 1v5a1 1 0 002 0v-5a1 1 0 00-1-1z"/></svg>
+        </div>
+        <div>
+          <div class="card-name">ATRION Android</div>
+          <div class="card-ver">APK · Side-load install</div>
+        </div>
+      </div>
+      <p class="desc">Full ATRION mobile app for Android. AI signals, live charts, voice trading, biometric login. Direct APK — no Play Store needed.</p>
+      <a class="btn android" href="/atrion/ATRION.apk">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download APK
+      </a>
+      <div class="note">Android 10+ · Allow "Install unknown apps" in Settings</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="icon ios">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        </div>
+        <div>
+          <div class="card-name">ATRION iPhone</div>
+          <div class="card-ver">iOS Ad-hoc install</div>
+        </div>
+      </div>
+      <p class="desc">ATRION for iPhone — same full feature set. Ad-hoc OTA install (not App Store). Your UDID must be registered; contact us to add your device.</p>
+      <a class="btn ios" href="/atrion/">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        Install on iPhone
+      </a>
+      <div class="note">iOS 15+ · Requires UDID registration — <a href="mailto:theyashwaghela@gmail.com">contact us</a></div>
+    </div>
+  </div>
+
+  <!-- Requirements -->
+  <div class="section-title">System Requirements</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-name" style="color:#fff;margin-bottom:10px">Desktop (Windows)</div>
+      <ul style="color:var(--muted);font-size:14px;padding-left:18px;line-height:2">
+        <li>Windows 10 or Windows 11 (64-bit)</li>
+        <li>MetaTrader 5 installed (for live trading)</li>
+        <li>4 GB RAM minimum</li>
+        <li>Stable internet connection</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-name" style="color:#fff;margin-bottom:10px">Mobile</div>
+      <ul style="color:var(--muted);font-size:14px;padding-left:18px;line-height:2">
+        <li>Android 10+ (APK side-load)</li>
+        <li>iOS 15+ (ad-hoc, UDID required)</li>
+        <li>Stable internet connection</li>
+        <li>Camera (for face-lock biometric login)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-name" style="color:#fff;margin-bottom:10px">Need Help?</div>
+      <p style="color:var(--muted);font-size:14px;line-height:1.8">Email us at <a href="mailto:theyashwaghela@gmail.com">theyashwaghela@gmail.com</a> for account setup, iOS UDID registration, or any issues installing the app.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  &copy; 2026 BloomAI &amp; ATRION — Professional AI Trading Platforms
+</footer>
+
+<script>
+// Dynamically fetch latest release versions from GitHub
+async function loadVersions() {
+  try {
+    const [bRes, aRes] = await Promise.all([
+      fetch('https://api.github.com/repos/YNW1606/bloomai-releases/releases/latest'),
+      fetch('https://api.github.com/repos/YNW1606/atrion-releases/releases/latest')
+    ]);
+    if (bRes.ok) {
+      const b = await bRes.json();
+      const ver = b.tag_name || '';
+      document.getElementById('bloomai-ver').textContent = 'Version ' + ver + ' · Windows 64-bit';
+      const asset = b.assets && b.assets.find(a => a.name.endsWith('.exe') && !a.name.endsWith('.blockmap'));
+      if (asset) {
+        const btn = document.getElementById('bloomai-btn');
+        btn.href = asset.browser_download_url;
+        btn.setAttribute('download', asset.name);
+        btn.removeAttribute('target');
+      }
+    }
+    if (aRes.ok) {
+      const a = await aRes.json();
+      const ver2 = a.tag_name || '';
+      document.getElementById('atrion-win-ver').textContent = 'Version ' + ver2 + ' · Windows 64-bit';
+      const asset2 = a.assets && a.assets.find(x => x.name.endsWith('.exe') && !x.name.endsWith('.blockmap'));
+      if (asset2) {
+        const btn2 = document.getElementById('atrion-win-btn');
+        btn2.href = asset2.browser_download_url;
+        btn2.setAttribute('download', asset2.name);
+        btn2.removeAttribute('target');
+      }
+    }
+  } catch(e) {}
+}
+loadVersions();
+</script>
+</body>
+</html>
