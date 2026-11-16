@@ -82,16 +82,16 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:13px;border-t
         </div>
         <div>
           <div class="card-name">BloomAI Desktop</div>
-          <div class="card-ver" id="bloomai-ver">Windows 64-bit</div>
+          <div class="card-ver" id="bloomai-ver">Version 1.0.137 · Windows 64-bit</div>
         </div>
         <span class="badge">FREE</span>
       </div>
       <p class="desc">10 self-evolving AI engines, live MT5 integration, 500+ instruments, Kelly sizing, voice assistant ARIA, institutional-grade analysis.</p>
-      <a id="bloomai-btn" class="btn primary" href="https://github.com/YNW1606/bloomai-releases/releases/latest" target="_blank" rel="noopener">
+      <a id="bloomai-btn" class="btn primary" href="https://github.com/YNW1606/bloomai-releases/releases/download/v1.0.137/BloomAI-Setup-1.0.137.exe" download="BloomAI-Setup-1.0.137.exe">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Download for Windows
       </a>
-      <div class="note">Requires Windows 10/11 · 64-bit · ~290 MB</div>
+      <div class="note">Requires Windows 10/11 · 64-bit · ~160 MB</div>
     </div>
   </div>
 
@@ -105,16 +105,16 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:13px;border-t
         </div>
         <div>
           <div class="card-name">ATRION Desktop</div>
-          <div class="card-ver" id="atrion-win-ver">Windows 64-bit</div>
+          <div class="card-ver" id="atrion-win-ver">Version 2.0.6 · Windows 64-bit</div>
         </div>
         <span class="badge">FREE</span>
       </div>
       <p class="desc">Full ATRION trading terminal for Windows — live charts, AI signals, order management, voice ARIA assistant, and MT5 bridge.</p>
-      <a id="atrion-win-btn" class="btn primary" href="https://github.com/YNW1606/atrion-releases/releases/latest" target="_blank" rel="noopener">
+      <a id="atrion-win-btn" class="btn primary" href="https://github.com/YNW1606/atrion-releases/releases/download/v2.0.6/ATRION-Setup-2.0.6.exe" download="ATRION-Setup-2.0.6.exe">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Download for Windows
       </a>
-      <div class="note">Requires Windows 10/11 · 64-bit · ~170 MB</div>
+      <div class="note">Requires Windows 10/11 · 64-bit · ~160 MB</div>
     </div>
 
     <div class="card">
@@ -188,38 +188,38 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:13px;border-t
 </footer>
 
 <script>
-// Dynamically fetch latest release versions from GitHub
-async function loadVersions() {
+// Fetch the latest .exe installer from recent releases (skips zip-only releases)
+async function findLatestExe(repo) {
   try {
-    const [bRes, aRes] = await Promise.all([
-      fetch('https://api.github.com/repos/YNW1606/bloomai-releases/releases/latest'),
-      fetch('https://api.github.com/repos/YNW1606/atrion-releases/releases/latest')
-    ]);
-    if (bRes.ok) {
-      const b = await bRes.json();
-      const ver = b.tag_name || '';
-      document.getElementById('bloomai-ver').textContent = 'Version ' + ver + ' · Windows 64-bit';
-      const asset = b.assets && b.assets.find(a => a.name.endsWith('.exe') && !a.name.endsWith('.blockmap'));
-      if (asset) {
-        const btn = document.getElementById('bloomai-btn');
-        btn.href = asset.browser_download_url;
-        btn.setAttribute('download', asset.name);
-        btn.removeAttribute('target');
-      }
-    }
-    if (aRes.ok) {
-      const a = await aRes.json();
-      const ver2 = a.tag_name || '';
-      document.getElementById('atrion-win-ver').textContent = 'Version ' + ver2 + ' · Windows 64-bit';
-      const asset2 = a.assets && a.assets.find(x => x.name.endsWith('.exe') && !x.name.endsWith('.blockmap'));
-      if (asset2) {
-        const btn2 = document.getElementById('atrion-win-btn');
-        btn2.href = asset2.browser_download_url;
-        btn2.setAttribute('download', asset2.name);
-        btn2.removeAttribute('target');
-      }
+    const res = await fetch('https://api.github.com/repos/' + repo + '/releases?per_page=10');
+    if (!res.ok) return null;
+    const releases = await res.json();
+    for (const rel of releases) {
+      const asset = (rel.assets || []).find(a => a.name.endsWith('.exe') && !a.name.endsWith('.blockmap'));
+      if (asset) return { tag: rel.tag_name, asset };
     }
   } catch(e) {}
+  return null;
+}
+async function loadVersions() {
+  const [b, a] = await Promise.all([
+    findLatestExe('YNW1606/bloomai-releases'),
+    findLatestExe('YNW1606/atrion-releases')
+  ]);
+  if (b) {
+    document.getElementById('bloomai-ver').textContent = 'Version ' + b.tag + ' · Windows 64-bit';
+    const btn = document.getElementById('bloomai-btn');
+    btn.href = b.asset.browser_download_url;
+    btn.setAttribute('download', b.asset.name);
+    btn.removeAttribute('target');
+  }
+  if (a) {
+    document.getElementById('atrion-win-ver').textContent = 'Version ' + a.tag + ' · Windows 64-bit';
+    const btn2 = document.getElementById('atrion-win-btn');
+    btn2.href = a.asset.browser_download_url;
+    btn2.setAttribute('download', a.asset.name);
+    btn2.removeAttribute('target');
+  }
 }
 loadVersions();
 </script>
