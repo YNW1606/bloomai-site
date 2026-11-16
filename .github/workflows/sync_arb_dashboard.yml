@@ -1,0 +1,39 @@
+name: Sync Arb Dashboard
+
+on:
+  schedule:
+    - cron: '15 * * * *'   # Every hour at :15 past (after crypto_scan pushes at :00)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Fetch latest dashboard from crypto arb repo
+      run: |
+        curl -sSfL \
+          "https://raw.githubusercontent.com/ynw1606/UNIVERSAL_CRYPTO_ARB/main/docs/index.html" \
+          -o arb/index.html
+        echo "Fetched dashboard at $(date -u)"
+
+    - name: Configure git
+      run: |
+        git config user.email "bloomai-bot@bloomai.technology"
+        git config user.name "BloomAI Bot"
+
+    - name: Commit and push if changed
+      run: |
+        git add arb/index.html
+        if ! git diff --staged --quiet; then
+          git commit -m "sync: arb dashboard $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push
+        else
+          echo "No changes to push"
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
