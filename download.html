@@ -87,7 +87,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:13px;border-t
         <span class="badge">FREE</span>
       </div>
       <p class="desc">10 self-evolving AI engines, live MT5 integration, 500+ instruments, Kelly sizing, voice assistant ARIA, institutional-grade analysis.</p>
-      <a id="bloomai-btn" class="btn primary" href="https://github.com/YNW1606/bloomai-releases/releases/download/v1.0.137/BloomAI-Setup-1.0.137.exe" download="BloomAI-Setup-1.0.137.exe">
+      <a id="bloomai-btn" class="btn primary" href="/get/bloomai-win.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Download for Windows
       </a>
@@ -110,7 +110,7 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:13px;border-t
         <span class="badge">FREE</span>
       </div>
       <p class="desc">Full ATRION trading terminal for Windows — live charts, AI signals, order management, voice ARIA assistant, and MT5 bridge.</p>
-      <a id="atrion-win-btn" class="btn primary" href="https://github.com/YNW1606/atrion-releases/releases/download/v2.0.6/ATRION-Setup-2.0.6.exe" download="ATRION-Setup-2.0.6.exe">
+      <a id="atrion-win-btn" class="btn primary" href="/get/atrion-win.html">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Download for Windows
       </a>
@@ -188,40 +188,34 @@ footer{text-align:center;padding:28px;color:var(--muted);font-size:13px;border-t
 </footer>
 
 <script>
-// Fetch the latest .exe installer from recent releases (skips zip-only releases)
-async function findLatestExe(repo) {
+// Version labels fetched from GitHub (display only — does not change download link)
+async function loadVersionLabels() {
   try {
-    const res = await fetch('https://api.github.com/repos/' + repo + '/releases?per_page=10');
-    if (!res.ok) return null;
-    const releases = await res.json();
-    for (const rel of releases) {
-      const asset = (rel.assets || []).find(a => a.name.endsWith('.exe') && !a.name.endsWith('.blockmap'));
-      if (asset) return { tag: rel.tag_name, asset };
+    const [bRes, aRes] = await Promise.all([
+      fetch('https://api.github.com/repos/YNW1606/bloomai-releases/releases?per_page=10'),
+      fetch('https://api.github.com/repos/YNW1606/atrion-releases/releases?per_page=10')
+    ]);
+    if (bRes.ok) {
+      const rels = await bRes.json();
+      for (const r of rels) {
+        if ((r.assets||[]).find(a => a.name.endsWith('.exe') && !a.name.endsWith('.blockmap'))) {
+          document.getElementById('bloomai-ver').textContent = 'Version ' + r.tag_name + ' · Windows 64-bit';
+          break;
+        }
+      }
+    }
+    if (aRes.ok) {
+      const rels = await aRes.json();
+      for (const r of rels) {
+        if ((r.assets||[]).find(a => a.name.endsWith('.exe') && !a.name.endsWith('.blockmap'))) {
+          document.getElementById('atrion-win-ver').textContent = 'Version ' + r.tag_name + ' · Windows 64-bit';
+          break;
+        }
+      }
     }
   } catch(e) {}
-  return null;
 }
-async function loadVersions() {
-  const [b, a] = await Promise.all([
-    findLatestExe('YNW1606/bloomai-releases'),
-    findLatestExe('YNW1606/atrion-releases')
-  ]);
-  if (b) {
-    document.getElementById('bloomai-ver').textContent = 'Version ' + b.tag + ' · Windows 64-bit';
-    const btn = document.getElementById('bloomai-btn');
-    btn.href = b.asset.browser_download_url;
-    btn.setAttribute('download', b.asset.name);
-    btn.removeAttribute('target');
-  }
-  if (a) {
-    document.getElementById('atrion-win-ver').textContent = 'Version ' + a.tag + ' · Windows 64-bit';
-    const btn2 = document.getElementById('atrion-win-btn');
-    btn2.href = a.asset.browser_download_url;
-    btn2.setAttribute('download', a.asset.name);
-    btn2.removeAttribute('target');
-  }
-}
-loadVersions();
+loadVersionLabels();
 </script>
 </body>
 </html>
